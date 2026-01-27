@@ -1,5 +1,11 @@
 import fs from "fs";
 import path from "path";
+export function getFileTypes(args) {
+    if (args.only_crx)
+        return 'crx';
+    else if (args.only_zip)
+        return 'zip';
+}
 export function getConfig(args) {
     const config = JSON.parse(fs.readFileSync('package.json', 'utf-8')).crxConfig || {};
     const preDistDirectory = args.pre_dist || config.pre_dist || 'pre_dist';
@@ -8,7 +14,11 @@ export function getConfig(args) {
         pre_dist: preDistDirectory,
         dist: args.dist || config.dist || 'dist',
         key_file: args.key_file || config.key_file || 'key.pem',
-        manifest: args.manifest || config.manifest || path.join(preDistDirectory, 'manifest.json')
+        manifest: args.manifest || config.manifest || path.join(preDistDirectory, 'manifest.json'),
+        file_type: getFileTypes(args) || config.file_type || 'all',
+        filetypeOnly: function (fileType) {
+            return [fileType, 'all'].includes(fileType);
+        }
     };
 }
 export function getManifest(filename) {

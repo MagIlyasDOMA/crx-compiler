@@ -2,7 +2,7 @@
 import { ArgumentParser } from "argparse";
 import * as crypto from 'crypto';
 import * as fs from 'fs';
-import { __version__ } from "./index";
+import { __version__ } from "./index.js";
 function generateChromeExtensionKey(privatePath = 'key.pem', publicPath = 'public.txt') {
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
         modulusLength: 2048,
@@ -34,7 +34,7 @@ function generateChromeExtensionKey(privatePath = 'key.pem', publicPath = 'publi
     console.log(`"key": "${publicKeyBase64}"`);
 }
 function main() {
-    const parser = new ArgumentParser();
+    const parser = new ArgumentParser({ description: "Chrome extension key generator" });
     parser.add_argument('private_key_path', { type: 'str', help: 'Path to private key file',
         nargs: '?', default: 'key.pem' });
     parser.add_argument('public_key_path', { type: 'str', help: 'Path to public key file',
