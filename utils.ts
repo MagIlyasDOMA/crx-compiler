@@ -1,8 +1,13 @@
 import fs from "fs";
 import path from "path";
-import {Manifest, PackageCrxConfig, PackageCrxOptions} from "./types.js";
+import {CompilerArgs, FileType, Manifest, PackageCrxConfig} from "./types.js";
 
-export function getConfig(args: PackageCrxOptions): PackageCrxConfig {
+export function getFileTypes(args: CompilerArgs): FileType | void {
+    if (args.only_crx) return 'crx';
+    else if (args.only_zip) return 'zip';
+}
+
+export function getConfig(args: CompilerArgs): PackageCrxConfig {
     const config: PackageCrxConfig = JSON.parse(fs.readFileSync('package.json', 'utf-8')).crxConfig || {};
     const preDistDirectory = args.pre_dist || config.pre_dist || 'pre_dist'
     return {
@@ -10,8 +15,12 @@ export function getConfig(args: PackageCrxOptions): PackageCrxConfig {
         pre_dist: preDistDirectory,
         dist: args.dist || config.dist || 'dist',
         key_file: args.key_file || config.key_file || 'key.pem',
-        manifest: args.manifest || config.manifest || path.join(preDistDirectory, 'manifest.json')
-    }
+        manifest: args.manifest || config.manifest || path.join(preDistDirectory, 'manifest.json'),
+        file_type: getFileTypes(args) || config.file_type || 'all',
+        filetypeOnly: function (fileType: FileType) {
+            return [fileType, 'all'].includes(fileType);
+        }
+    };
 }
 
 export function getManifest(filename: string): Manifest {

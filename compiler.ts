@@ -11,13 +11,17 @@ import { PackageCrxConfig } from "./types.js";
 
 function main() {
     const parser = new ArgumentParser({description: 'Chrome extension compiler'});
-    
+    const fileTypeGroup = parser.add_mutually_exclusive_group();
+
     parser.add_argument('--src', '-s', {type: 'str', help: 'Source directory with extension files'});
     parser.add_argument('--pre-dist', '-p', {type: 'str', help: 'Directory for preparing files for assembly'});
     parser.add_argument('--dist', '-d', {type: 'str', help: 'Directory for output files (.crx, .zip)'});
     parser.add_argument('--key-file', '-k', {type: 'str', help: 'File with private key for signing CRX'});
     parser.add_argument('--manifest', '-m', {type: 'str', help: 'Path to the manifest.json file'})
     parser.add_argument('--version', '-v', {action: 'version', version: __version__})
+
+    fileTypeGroup.add_argument('--only-crx', '-c', {action: 'store_true', help: 'Don\'t create a zip file'})
+    fileTypeGroup.add_argument('--only-zip', '-z', {action: 'store_true', help: 'Don\'t create a crx file'})
 
     const config: PackageCrxConfig = getConfig(parser.parse_args())
     const manifest = getPackage();
@@ -28,27 +32,30 @@ function main() {
     execSync('tsc')
 
     exec(`crx3 pack ${config.pre_dist} -p ${config.key_file} -o ${extensionFile}.crx`, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error creating CRX: ${error}`);
-            return;
+        if (config.filetypeOnly('crx')) {
+            if (error) {
+                console.error(`Error creating CRX: ${error}`);
+                return;
+            }
+            console.log('CRX file created');
+        } else fs.rmSync(extensionFile + '.crx')
+
+        if (config.filetypeOnly('zip')) {
+            const output = fs.createWriteStream(extensionFile + '.zip');
+            const archive = archiver('zip', {zlib: {level: 9}});
+
+            output.on('close', () => {
+                console.log(`Archive created: ${archive.pointer()} bytes`);
+            });
+
+            archive.on('error', (err) => {
+                throw err;
+            });
+
+            archive.pipe(output);
+            archive.directory(config.pre_dist, false);
+            archive.finalize();
         }
-        console.log('CRX file created');
-
-        // Создаем архив
-        const output = fs.createWriteStream(extensionFile + '.zip');
-        const archive = archiver('zip', {zlib: {level: 9}});
-
-        output.on('close', () => {
-            console.log(`Archive created: ${archive.pointer()} bytes`);
-        });
-
-        archive.on('error', (err) => {
-            throw err;
-        });
-
-        archive.pipe(output);
-        archive.directory(config.pre_dist, false);
-        archive.finalize();
     })
 }
 
