@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import {Manifest, PackageCrxConfig, PackageCrxOptions} from "./types.js";
 
 export function getConfig(args: PackageCrxOptions): PackageCrxConfig {
     const config: PackageCrxConfig = JSON.parse(fs.readFileSync('package.json', 'utf-8')).crxConfig || {};

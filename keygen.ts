@@ -2,7 +2,8 @@
 import {ArgumentParser} from "argparse";
 import * as crypto from 'crypto';
 import * as fs from 'fs';
-import {__version__} from "./index";
+import {__version__} from "./index.js";
+import { KeygenArgs } from "./types.js";
 
 function generateChromeExtensionKey(privatePath: string = 'key.pem',
                                     publicPath: string = 'public.txt'): void {
@@ -16,11 +17,10 @@ function generateChromeExtensionKey(privatePath: string = 'key.pem',
             type: 'pkcs8',
             format: 'pem',
             cipher: 'aes-256-cbc',
-            passphrase: '' // без пароля для совместимости с Chrome
+            passphrase: ''
         }
     });
 
-    // Конвертация публичного ключа в формат для Chrome
     const publicKeyDer = Buffer.from(
         publicKey
             .replace(/-----BEGIN PUBLIC KEY-----/, '')
@@ -34,7 +34,6 @@ function generateChromeExtensionKey(privatePath: string = 'key.pem',
         .replace(/\//g, '_')
         .replace(/=+$/, '');
 
-    // Сохранение ключей
     fs.writeFileSync(privatePath, privateKey);
     fs.writeFileSync(publicPath, publicKeyBase64);
 
@@ -46,7 +45,7 @@ function generateChromeExtensionKey(privatePath: string = 'key.pem',
 }
 
 function main() {
-    const parser = new ArgumentParser();
+    const parser = new ArgumentParser({description: "Chrome extension key generator"});
     parser.add_argument('private_key_path', {type: 'str', help: 'Path to private key file',
         nargs: '?', default: 'key.pem'})
     parser.add_argument('public_key_path', {type: 'str', help: 'Path to public key file',

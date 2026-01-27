@@ -18,3 +18,5 @@ interface KeygenArgs {
     private_key_path: string;
     public_key_path: string;
 }
+
+export type {PackageCrxOptions, Manifest, KeygenArgs, PackageCrxConfig}

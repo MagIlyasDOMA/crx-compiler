@@ -5,11 +5,13 @@ import path from 'path'
 import archiver from 'archiver'
 import {ArgumentParser} from "argparse";
 import {__version__} from "./index.js";
-import {createDirs, getConfig, getManifest, getPackage} from "./utils.js";
+import {createDirs, getConfig, getPackage} from "./utils.js";
+import { PackageCrxConfig } from "./types.js";
 
 
 function main() {
-    const parser = new ArgumentParser();
+    const parser = new ArgumentParser({description: 'Chrome extension compiler'});
+    
     parser.add_argument('--src', '-s', {type: 'str', help: 'Source directory with extension files'});
     parser.add_argument('--pre-dist', '-p', {type: 'str', help: 'Directory for preparing files for assembly'});
     parser.add_argument('--dist', '-d', {type: 'str', help: 'Directory for output files (.crx, .zip)'});
@@ -27,17 +29,17 @@ function main() {
 
     exec(`crx3 pack ${config.pre_dist} -p ${config.key_file} -o ${extensionFile}.crx`, (error, stdout, stderr) => {
         if (error) {
-            console.error(`Ошибка при создании CRX: ${error}`);
+            console.error(`Error creating CRX: ${error}`);
             return;
         }
-        console.log('CRX файл создан');
+        console.log('CRX file created');
 
         // Создаем архив
         const output = fs.createWriteStream(extensionFile + '.zip');
         const archive = archiver('zip', {zlib: {level: 9}});
 
         output.on('close', () => {
-            console.log(`Архив создан: ${archive.pointer()} байт`);
+            console.log(`Archive created: ${archive.pointer()} bytes`);
         });
 
         archive.on('error', (err) => {
