@@ -1,0 +1,41 @@
+{
+  "name": "crx-compiler",
+  "version": "1.0.0",
+  "description": "Chrome extensions compiler",
+  "bin": {
+    "crx-compiler": "compiler.js",
+    "crx-keygen": "keygen.js",
+    "crx-tsc-init": "tsc_init.js"
+  },
+  "keywords": [
+    "cli",
+    "crx",
+    "compile"
+  ],
+  "homepage": "https://github.com/MagIlyasDOMA/crx-compiler#readme",
+  "bugs": {
+    "url": "https://github.com/MagIlyasDOMA/crx-compiler/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MagIlyasDOMA/crx-compiler.git"
+  },
+  "license": "GPL-3.0-only",
+  "author": "Маг Ильяс DOMA (MagIlyasDOMA)",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "tsc && npm link"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "argparse": "^2.0.1",
+    "crx3": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/archiver": "^7.0.0",
+    "@types/argparse": "^2.0.17",
+    "@types/node": "^25.0.10",
+    "typescript": "^5.9.3"
+  }
+}
