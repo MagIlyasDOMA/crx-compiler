@@ -7,6 +7,7 @@ if (!file) {
 }
 try {
     fs.renameSync(file, 'crx-compiler-dist.tgz');
+    console.log('crx-compiler-dist.tgz');
 }
 catch (error) {
     console.error("Rename error", error);

@@ -4,7 +4,7 @@ import { __version__ } from "./index.js";
 import path from "path";
 import fs from "fs-extra";
 export function initParser() {
-    const parser = new ArgumentParser();
+    const parser = new ArgumentParser({ description: "Creating predist directory" });
     parser.add_argument('--src', '-s', { type: 'str', help: 'Source directory with extension files' });
     parser.add_argument('--pre-dist', '-p', { type: 'str', help: 'Directory for preparing files for assembly' });
     parser.add_argument('--version', '-v', { action: 'version', version: __version__ });

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { ArgumentParser as BaseParser } from "argparse";
-import { KeygenConfig } from "./types.js";
+import { KeygenConfig } from "./types";
 export declare class ArgumentParser extends BaseParser {
     parseArgs(): KeygenConfig;
 }
