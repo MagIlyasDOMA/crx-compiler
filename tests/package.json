@@ -1,0 +1,8 @@
+{
+  "name": "crx-compiler-test",
+  "version": "1.0.0",
+  "description": "crx-compiler test",
+  "dependencies": {
+    "crx-compiler": "file:../crx-compiler.tgz"
+  }
+}

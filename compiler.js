@@ -1,12 +1,13 @@
 #!/usr/bin/env node
-import { exec, execSync } from 'child_process';
+import { exec } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import archiver from 'archiver';
 import { ArgumentParser as BaseParser } from "argparse";
 import { __version__ } from "./index.js";
 import { createDirs, getConfig, getPackage } from "./utils.js";
-class ArgumentParser extends BaseParser {
+import precompile from "./precompile.js";
+export class ArgumentParser extends BaseParser {
     parse_args(args, ns) {
         const output = super.parse_args(args, ns);
         if (output.only_crx && output.only_zip)
@@ -14,7 +15,7 @@ class ArgumentParser extends BaseParser {
         return output;
     }
 }
-function main() {
+export default function main() {
     const parser = new ArgumentParser({ description: 'Chrome extension compiler' });
     parser.add_argument('--src', '-s', { type: 'str', help: 'Source directory with extension files' });
     parser.add_argument('--pre-dist', '-p', { type: 'str', help: 'Directory for preparing files for assembly' });
@@ -28,7 +29,7 @@ function main() {
     const manifest = getPackage();
     const extensionFile = path.join(config.dist, `${manifest.name || 'extension'}-${manifest.version || '1.0.0'}`);
     createDirs(config.src, config.pre_dist, config.dist);
-    execSync('tsc');
+    precompile(config);
     if (config.filetypeOnly('crx')) {
         exec(`crx3 pack ${config.pre_dist} -p ${config.key_file} -o ${extensionFile}.crx`, (error, stdout, stderr) => {
             if (error) {

@@ -6,10 +6,10 @@ import archiver from 'archiver'
 import {ArgumentParser as BaseParser, Namespace} from "argparse";
 import {__version__} from "./index.js";
 import {createDirs, getConfig, getPackage} from "./utils.js";
-import { PackageCrxConfig, CompilerArgs } from "./types.js";
+import { PackageCrxConfig, CompilerArgs } from "./types";
+import precompile from "./precompile.js";
 
-
-class ArgumentParser extends BaseParser {
+export class ArgumentParser extends BaseParser {
     parse_args(args?: string[], ns?: Namespace | object): CompilerArgs {
         const output: CompilerArgs = super.parse_args(args, ns);
         if (output.only_crx && output.only_zip) throw new Error('The arguments are incompatible')
@@ -17,8 +17,7 @@ class ArgumentParser extends BaseParser {
     }
 }
 
-
-function main() {
+export default function main() {
     const parser = new ArgumentParser({description: 'Chrome extension compiler'});
 
     parser.add_argument('--src', '-s', {type: 'str', help: 'Source directory with extension files'});
@@ -36,8 +35,7 @@ function main() {
     const extensionFile = path.join(config.dist, `${manifest.name || 'extension'}-${manifest.version || '1.0.0'}`)
 
     createDirs(config.src, config.pre_dist, config.dist)
-
-    execSync('tsc')
+    precompile(config)
 
     if (config.filetypeOnly('crx')) {
         exec(`crx3 pack ${config.pre_dist} -p ${config.key_file} -o ${extensionFile}.crx`, (error, stdout, stderr) => {

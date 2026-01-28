@@ -4,7 +4,7 @@ import {getConfig} from "./utils.js";
 import {writeFileSync} from "fs";
 import {__version__} from "./index.js";
 
-function main() {
+export default function main() {
     const parser = new ArgumentParser({description: "TypeScript config generator for Chrome extensions"});
     parser.add_argument('input_dir', {type: 'str', help: 'Path to root directory', nargs: '?'});
     parser.add_argument('output_dir', {type: 'str', help: 'Path to output directory', nargs: '?'});

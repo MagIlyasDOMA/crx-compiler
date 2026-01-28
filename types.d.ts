@@ -1,7 +1,9 @@
 export type FileType = 'zip' | 'crx' | 'all';
-interface BasePackageCrxConfig {
+export interface PrecompileConfig {
     src: string;
     pre_dist: string;
+}
+export interface BasePackageCrxConfig extends PrecompileConfig {
     dist: string;
     key_file: string;
     manifest: string;
@@ -27,5 +29,4 @@ export interface KeygenArgs extends Partial<KeygenConfig> {
     private_key_path: string;
     public_key_path: string;
 }
-export {};
 //# sourceMappingURL=types.d.ts.map

@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 import {ArgumentParser as BaseParser} from "argparse";
-import * as crypto from 'crypto';
-import * as fs from 'fs';
+import crypto from 'crypto';
+import fs from 'fs';
+import path from "path";
 import {__version__} from "./index.js";
-import { KeygenArgs, KeygenConfig } from "./types.js";
+import { KeygenArgs, KeygenConfig } from "./types";
 
-class ArgumentParser extends BaseParser {
+export class ArgumentParser extends BaseParser {
     parseArgs(): KeygenConfig {
         const args: KeygenArgs = this.parse_args();
         return {
@@ -15,7 +16,7 @@ class ArgumentParser extends BaseParser {
     }
 }
 
-function generateChromeExtensionKey(config: KeygenConfig): void {
+export function generateChromeExtensionKey(config: KeygenConfig): void {
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
         modulusLength: 2048,
         publicKeyEncoding: {
@@ -44,7 +45,7 @@ function generateChromeExtensionKey(config: KeygenConfig): void {
         .replace(/=+$/, '');
 
     fs.writeFileSync(config.privateKey, privateKey);
-    fs.writeFileSync(config.publicKey, config.publicKey.endsWith('.pem') ? publicKey : publicKeyBase64);
+    fs.writeFileSync(config.publicKey, path.extname(config.publicKey) === '.pem' ? publicKey : publicKeyBase64);
 
     console.log('✅ Keys generated:');
     console.log(`   • ${config.privateKey} - private key`);
@@ -53,7 +54,7 @@ function generateChromeExtensionKey(config: KeygenConfig): void {
     console.log(`"key": "${publicKeyBase64}"`);
 }
 
-function main() {
+export default function main() {
     const parser = new ArgumentParser({description: "Chrome extension key generator"});
     parser.add_argument('private_key_path', {type: 'str', help: 'Path to private key file',
         nargs: '?', default: 'key.pem'})

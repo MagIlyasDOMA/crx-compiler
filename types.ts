@@ -1,8 +1,11 @@
 export type FileType = 'zip' | 'crx' | 'all'
 
-interface BasePackageCrxConfig {
+export interface PrecompileConfig {
     src: string;
     pre_dist: string;
+}
+
+export interface BasePackageCrxConfig extends PrecompileConfig {
     dist: string;
     key_file: string;
     manifest: string;

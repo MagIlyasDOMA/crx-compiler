@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Chrome extensions compiler",
   "bin": {
+    "crx-precompile": "precompile.js",
     "crx-compiler": "compiler.js",
     "crx-keygen": "keygen.js",
     "crx-tsc-init": "tsc_init.js",
@@ -25,17 +26,22 @@
   "author": "Маг Ильяс DOMA (MagIlyasDOMA)",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "pack": "tsc && npm pack"
+    "precompile": "node precompile.js",
+    "compile": "node compiler.js",
+    "keygen": "node keygen.js",
+    "create_tsconfig": "node tsc_init.js",
+    "pack": "tsc && npm pack && node dev_scripts/rename_dist.js"
   },
   "dependencies": {
     "archiver": "^7.0.1",
     "argparse": "^2.0.1",
-    "crx3": "^2.0.0"
+    "crx3": "^2.0.0",
+    "fs-extra": "^11.3.3"
   },
   "devDependencies": {
     "@types/archiver": "^7.0.0",
     "@types/argparse": "^2.0.17",
+    "@types/fs-extra": "^11.0.4",
     "@types/node": "^25.0.10",
     "typescript": "^5.9.3"
   },
