@@ -1,142 +1,95 @@
 <a id="doc_en"></a>
-# CRX Compiler
+# CRX Compiler - Documentation
 #### [Документация на русском](#doc_ru)
-## Description
-CRX Compiler is a command-line tool for building Chrome extensions (CRX files) from TypeScript source code. The package provides utilities for generating signing keys, configuring TypeScript settings, and creating ready-to-use extensions.
+## 📦 Overview
+CRX Compiler is a command-line tool for building and signing Chrome extensions. It automates the process of compiling TypeScript, packaging into CRX/ZIP formats, and generating keys for signing extensions.
 
-## Installation
-### Global installation
+## 🚀 Installation
+### Global Installation
 ```shell
 npm install -g crx-compiler
 ```
 
-### Local installation
+### Using in a Project
 ```shell
 npm install --save-dev crx-compiler
 ```
 
-## Main Commands
-### `crx-compiler` - Extension Compiler
-Compiles TypeScript code and creates a CRX file and a ZIP archive of the extension.
-
-#### Usage:
+## 🛠️ Main Commands
+### 1. Creating TypeScript Configuration
 ```shell
-crx-compiler [options]
+# Creates tsconfig.json for Chrome extension
+crx-tsc-init
+# Or
+crx-tsconfig
+
+# With parameters
+crx-tsc-init src pre_dist
+crx-tsc-init --input-dir src --output-dir pre_dist
+crx-tsc-init -i src -o pre_dist
 ```
 
-#### Options:
-- `--src`, `-s` - Source directory containing extension files (default: `src`)
-- `--pre-dist`, `-p` - Directory for preparing files before build (default: `pre_dist`)
-- `--dist`, `-d` - Output directory for files (.crx, .zip) (default: `dist`)
-- `--key-file`, `-k` - File with the private key for signing the CRX (default: `key.pem`)
-- `--manifest`, `-m` - Path to `manifest.json` file
+#### Parameters:
+- `input_dir`, `--input-dir`, `-i` - Source directory (default: src)
+- `output_dir`, `--output-dir`, `-o` - Output directory (default: pre_dist)
 - `--version`, `-v` - Show version
 
-#### Mutually exclusive group of options:
-- `--only-crx`, `-c` - Create only the CRX file (without ZIP archive)
-- `--only-zip`, `-z` - Create only the ZIP archive (without CRX file)
-  If none of these options are specified, both files (CRX and ZIP) are created.
-
-#### Usage examples:
+### 2. Key Generation
 ```shell
-# 1. Create only CRX file:
-crx-compiler --only-crx
-# or
-crx-compiler -c
+# Key generation for signing the extension
+crx-keygen
 
-# 2. Create only ZIP archive:
-crx-compiler --only-zip
-# or
-crx-compiler -z
+# With specified paths
+crx-keygen key.pem public_key.pem
+crx-keygen --private-key key.pem --public-key public_key.pem
+```
 
-# 3. Create both files (default):
+#### Parameters:
+- `private_key_path`, `--private-key`, `--private` - Path to the private key (default: key.pem)
+- `public_key_path`, `--public-key`, `--public` - Path to the public key (default: public_key.pem)
+
+### 3. Precompilation
+```shell
+# Preparing files for building
+crx-precompile
+
+# With parameters
+crx-precompile --src src --pre-dist pre_dist
+crx-precompile -s src -p pre_dist
+```
+
+#### Parameters:
+- `--src`, `-s` - Source directory (default: src)
+- `--pre-dist`, `-p` - Preparation directory (default: pre_dist)
+
+### 4. Full Extension Build
+```shell
+# Full build (CRX + ZIP)
 crx-compiler
 
-# 4. Full example with options:
-crx-compiler --src ./my-extension --dist ./build --key-file ./production-key.pem --only-zip
-```
+# Only CRX
+crx-compiler --only-crx
+crx-compiler -c
 
-## File Types
-### The package supports three operational modes:
-1. `all` - creates both CRX and ZIP files (default mode)
-2. `crx` - creates only a signed CRX file
-3. `zip` - creates only a ZIP archive for upload to Chrome Web Store
+# Only ZIP
+crx-compiler --only-zip
+crx-compiler -z
+# With Custom Paths  
+crx-compiler --src src --pre-dist pre_dist --dist dist --key-file key.pem  
+crx-compiler -s src -p pre_dist -d dist -k key.pem  
+```  
 
-### When to use different modes:
-- Only CRX (--only-crx):
-  - For local extension installation
-  - When a signed version is needed
-  - For distribution outside the Chrome Web Store
-- Only ZIP (--only-zip):
-  - For uploading to the Chrome Web Store
-  - For distribution through other channels
-  - When Chrome signing is not required
-- Both files (default mode):
-  - For a full distribution package
-  - When both versions are needed
-  - For testing different installation methods
+#### Parameters:
+- `--src`, `-s` - Source directory
+- `--pre-dist`, `-p` - Directory for build preparation
+- `--dist`, `-d` - Output directory
+- `--key-file`, `-k` - Private key file
+- `--manifest`, `-m` - Path to manifest.json
+- `--only-crx`, `-c` - Build only CRX
+- `--only-zip`, `-z` - Build only ZIP
 
-### Example workflow:
-```shell
-# 1. Development - create both files for testing
-crx-compiler --src ./src --dist ./dev-build
-
-# 2. Preparation for publication - only ZIP for Web Store
-crx-compiler --src ./src --dist ./release --only-zip
-
-# 3. Distribution - only CRX for local installation
-crx-compiler --src ./src --dist ./distribution --only-crx
-```
-
-### `crx-keygen` - Key Generator
-Generates a key pair for signing Chrome extensions.
-
-#### Usage:
-```shell
-crx-keygen [private_key_path] [public_key_path]
-```
-
-#### Arguments:
-- `private_key_path` - Path to save the private key (default: `key.pem`)
-- `public_key_path` - Path to save the public key (default: `public_key.pem`)
-
-#### Options:
-- `--private-key`, `--private` - Path to save the private key (overrides positional argument)
-- `--public-key`, `--public` - Path to save the public key (overrides positional argument)
-- `--version`, `-v` - Show version
-
-#### Example:
-```shell
-crx-keygen ./keys/private.pem ./keys/public.txt
-```
-
-#### Result:
-- Creates a private key in the specified file
-- Creates a public key in base64 format for addition to `manifest.json`
-- Outputs instructions in the console for adding the key to `manifest.json`
-
-### `crx-tsc-init` - TypeScript Configuration Generator
-Creates a `tsconfig.json` file for compiling the TypeScript code of a Chrome extension.
-
-#### Usage:
-```shell
-crx-tsc-init [input_directory] [output_directory]
-```
-#### Arguments:
-- `input_dir` - Root directory of the source code
-- `output_dir` - Directory for compiled files
-
-#### Options:
-- `--input-dir`, `-i` - Root directory of the source code
-- `--output-dir`, `-o` - Directory for compiled files
-
-#### Example:
-```shell
-crx-tsc-init ./src ./dist
-```
-
-## Configuration via package.json
-You can configure the compiler options in your project's `package.json` file:
+## ⚙️ Configuration via package.json
+You can configure compilation parameters in your extension's `package.json`:
 ```json
 {
   "name": "my-extension",
@@ -146,215 +99,180 @@ You can configure the compiler options in your project's `package.json` file:
     "pre_dist": "pre_dist",
     "dist": "dist",
     "key_file": "key.pem",
-    "manifest": "pre_dist/manifest.json"
+    "manifest": "pre_dist/manifest.json",
+    "file_type": "all"
+  }
+}
+```  
+
+## 📋 File Types
+- `crx` - Signed Chrome Extension (requires key)
+- `zip` - Archive for uploading to Chrome Web Store
+- `all` - Both formats (default)
+
+## 🔑 Key Generation
+#### Keys are generated in RSA 2048 format:
+- Private key is stored in PEM format
+- Public key is converted to base64 for `manifest.json` and stored in PEM format
+
+After generating, add to `manifest.json`:
+```json
+{
+  "key": "your_public_key_in_base64"
+}
+```  
+
+## 🏗️ Workflow
+#### 1. Initialize the project:
+```shell
+crx-tsc-init
+```  
+#### 2. Generate keys:
+```shell
+crx-keygen
+```  
+#### 3. Add key to manifest.json
+#### 4. Build the extension:
+```shell
+crx-compiler
+```  
+
+## 📂 Default directory structure
+```text
+project/
+├── src/           # Extension source files  
+├── pre_dist/      # Prepared files (after tsc)  
+├── dist/          # Ready CRX/ZIP files  
+├── key.pem        # Private key  
+├── public_key.pem # Public key  
+└── tsconfig.json  # TypeScript configuration  
+```
+## ⚠️ Limitations
+- Incompatible arguments: `--only-crx` and `--only-zip` cannot be used simultaneously
+- To create CRX files, `crx3` must be installed
+- TypeScript files are automatically excluded from copying in pre_dist
+
+## 🔧 NPM Scripts (for development)
+```json
+{
+  "scripts": {
+    "precompile": "node precompile.js",
+    "compile": "node compiler.js",
+    "keygen": "node keygen.js",
+    "create_tsconfig": "node tsc_init.js",
+    "pack": "tsc && npm pack && node dev_scripts/rename_dist.js"
   }
 }
 ```
 
-## Project Structure
-Recommended structure for a Chrome extension project:
-```text
-my-extension/
-├── package.json
-├── tsconfig.json
-├── key.pem
-├── src/
-│   ├── manifest.json
-│   ├── background.ts
-│   ├── popup.ts
-│   └── content.ts
-├── pre_dist/ (created automatically)
-└── dist/ (created automatically)
-```
+## 🐛 Debugging
+#### If you encounter issues:
+1. Ensure all dependencies are installed
+2. Check file permissions
+3. Ensure the manifest.json is correct
+4. Verify that the private key exists and is accessible
 
-## Error Handling
-- When creating only the CRX file, if a signing error occurs, the process stops
-- When creating only the ZIP file, the CRX file is not created and not deleted (as it is not needed)
-- In default mode, both files are created independently of each other
+## 📄 License
+GPL-3.0-only - See the [LICENSE](https://github.com/MagIlyasDOMA/crx-compiler/blob/main/LICENSE) file for details
 
-## Workflow
-#### 1. Key generation (once):
-```shell
-crx-keygen
-```
+## 🤝 Contributing to the project
+Bug reports and feature requests are welcome via [GitHub Issues](https://github.com/MagIlyasDOMA/crx-compiler/issues)
 
-#### 2. Adding the public key to manifest.json:
-```json
-{
-  "name": "My Extension",
-  "version": "1.0.0",
-  "key": "your_public_key_base64"
-}
-```
-
-#### 3. Initializing TypeScript configuration:
-```shell
-crx-tsc-init
-```
-
-#### 4. Building the extension:
-```shell
-crx-compiler
-```
-
-## Dependencies
-- Node.js 14+
-- TypeScript 5.9+
-- Chrome for testing extensions
-
-## License
-[GPL-3.0-only](https://github.com/MagIlyasDOMA/crx-compiler/blob/main/LICENSE)
-
-## Author
-Маг Ильяс DOMA (MagIlyasDOMA)
-
-## Repository
-[https://github.com/MagIlyasDOMA/crx-compiler](https://github.com/MagIlyasDOMA/crx-compiler)
-
-## Support
-To report bugs and suggestions, use Issues on GitHub:
-[https://github.com/MagIlyasDOMA/crx-compiler/issues](https://github.com/MagIlyasDOMA/crx-compiler/issues)
+---
 
 <a id="doc_ru"></a>
-# CRX Compiler
+# CRX Compiler - Документация
 #### [Documentation in English](#doc_en)
-## Описание
-CRX Compiler - это инструмент командной строки для сборки Chrome расширений (CRX файлов) из исходного кода TypeScript. Пакет предоставляет утилиты для генерации ключей подписи, настройки TypeScript конфигурации и создания готовых расширений.
+## 📦 Обзор
+CRX Compiler - это инструмент командной строки для сборки и подписи Chrome расширений. Он автоматизирует процесс компиляции TypeScript, упаковки в CRX/ZIP форматы и генерации ключей для подписи расширений.
 
-## Установка
+## 🚀 Установка
 ### Глобальная установка
 ```shell
 npm install -g crx-compiler
 ```
 
-### Локальная установка
+### Использование в проекте
 ```shell
 npm install --save-dev crx-compiler
 ```
 
-## Основные команды
-### `crx-compiler` - Компилятор расширений
-Компилирует TypeScript код и создает CRX файл и ZIP архив расширения.
-
-#### Использование:
+## 🛠️ Основные команды
+### 1. Создание конфигурации TypeScript
 ```shell
-crx-compiler [опции]
+# Создает tsconfig.json для Chrome расширения
+crx-tsc-init
+# Или
+crx-tsconfig
+
+# С параметрами
+crx-tsc-init src pre_dist
+crx-tsc-init --input-dir src --output-dir pre_dist
+crx-tsc-init -i src -o pre_dist
 ```
 
-#### Опции:
-- `--src`, `-s` - Исходная директория с файлами расширения (по умолчанию: `src`)
-- `--pre-dist`, `-p` - Директория для подготовки файлов перед сборкой (по умолчанию: `pre_dist`)
-- `--dist`, `-d` - Выходная директория для файлов (.crx, .zip) (по умолчанию: `dist`)
-- `--key-file`, `-k` - Файл с приватным ключом для подписи CRX (по умолчанию: `key.pem`)
-- `--manifest`, `-m` - Путь к файлу `manifest.json`
+#### Параметры:
+- `input_dir`, `--input-dir`, `-i` - Исходная директория (по умолчанию: src)
+- `output_dir`, `--output-dir`, `-o` - Выходная директория (по умолчанию: pre_dist)
 - `--version`, `-v` - Показать версию
 
-#### Взаимоисключающая группа опций:
-- `--only-crx`, `-c` - Создать только CRX файл (без ZIP архива)
-- `--only-zip`, `-z` - Создать только ZIP архив (без CRX файла)
-Если ни одна из этих опций не указана, создаются оба файла (CRX и ZIP).
-
-#### Примеры использования:
+### 2. Генерация ключей
 ```shell
-# 1. Создать только CRX файл:
-crx-compiler --only-crx
-# или
-crx-compiler -c
+# Генерация ключей для подписи расширения
+crx-keygen
 
-# 2. Создать только ZIP архив:
-crx-compiler --only-zip
-# или
-crx-compiler -z
+# С указанием путей
+crx-keygen key.pem public_key.pem
+crx-keygen --private-key key.pem --public-key public_key.pem
+```
 
-# 3. Создать оба файла (по умолчанию):
+#### Параметры:
+- `private_key_path`, `--private-key`, `--private` - Путь к приватному ключу (по умолчанию: key.pem)
+- `public_key_path`, `--public-key`, `--public` - Путь к публичному ключу (по умолчанию: public_key.pem)
+
+### 3. Предварительная компиляция
+```shell
+# Подготовка файлов к сборке
+crx-precompile
+
+# С параметрами
+crx-precompile --src src --pre-dist pre_dist
+crx-precompile -s src -p pre_dist
+```
+
+#### Параметры:
+- `--src`, `-s` - Исходная директория (по умолчанию: src)
+- `--pre-dist`, `-p` - Директория для подготовки (по умолчанию: pre_dist)
+
+### 4. Полная сборка расширения
+```shell
+# Полная сборка (CRX + ZIP)
 crx-compiler
 
-# 4. Полный пример с опциями:
-crx-compiler --src ./my-extension --dist ./build --key-file ./production-key.pem --only-zip
+# Только CRX
+crx-compiler --only-crx
+crx-compiler -c
+
+# Только ZIP
+crx-compiler --only-zip
+crx-compiler -z
+
+# С кастомными путями
+crx-compiler --src src --pre-dist pre_dist --dist dist --key-file key.pem
+crx-compiler -s src -p pre_dist -d dist -k key.pem
 ```
 
-## Типы файлов
-### Пакет поддерживает три режима работы:
-1. `all` - создает и CRX, и ZIP файлы (режим по умолчанию)
-2. `crx` - создает только подписанный CRX файл
-3. `zip` - создает только ZIP архив для загрузки в Chrome Web Store
+#### Параметры:
+- `--src`, `-s` - Исходная директория
+- `--pre-dist`, `-p` - Директория для подготовки
+- `--dist`, `-d` - Выходная директория
+- `--key-file`, `-k` - Файл с приватным ключом
+- `--manifest`, `-m` - Путь к manifest.json
+- `--only-crx`, `-c` - Собрать только CRX
+- `--only-zip`, `-z` - Собрать только ZIP
 
-### Когда использовать разные режимы:
-- Только CRX (--only-crx):
-  - Для локальной установки расширения
-  - Когда нужна подписанная версия
-  - Для распространения вне Chrome Web Store
-- Только ZIP (--only-zip):
-  - Для загрузки в Chrome Web Store
-  - Для распространения через другие каналы
-  - Когда не требуется подпись Chrome
-- Оба файла (режим по умолчанию):
-  - Для полного пакета распространения
-  - Когда нужны обе версии
-  - Для тестирования разных способов установки
-
-### Пример рабочего процесса:
-```shell
-# 1. Разработка - создаем оба файла для тестирования
-crx-compiler --src ./src --dist ./dev-build
-
-# 2. Подготовка к публикации - только ZIP для Web Store
-crx-compiler --src ./src --dist ./release --only-zip
-
-# 3. Распространение - только CRX для локальной установки
-crx-compiler --src ./src --dist ./distribution --only-crx
-```
-
-### `crx-keygen` - Генератор ключей
-Генерирует пару ключей для подписи Chrome расширений.
-
-#### Использование:
-```shell
-crx-keygen [путь_к_приватному_ключу] [путь_к_публичному_ключу]
-```
-
-#### Аргументы:
-- `private_key_path` - Путь для сохранения приватного ключа (по умолчанию: `key.pem`)
-- `public_key_path` - Путь для сохранения публичного ключа (по умолчанию: `public_key.pem`)
-
-#### Опции:
-- `--private-key`, `--private` - Путь для сохранения приватного ключа (переопределяет позиционный аргумент)
-- `--public-key`, `--public` - Путь для сохранения публичного ключа (переопределяет позиционный аргумент)
-- `--version`, `-v` - Показать версию
-
-#### Пример:
-```shell
-crx-keygen ./keys/private.pem ./keys/public.txt
-```
-
-#### Результат:
-- Создает приватный ключ в указанном файле
-- Создает публичный ключ в формате base64 для добавления в manifest.json
-- Выводит в консоль инструкцию для добавления ключа в manifest.json
-
-### `crx-tsc-init` - Генератор конфигурации TypeScript
-Создает файл `tsconfig.json` для компиляции TypeScript кода Chrome расширения.
-
-#### Использование:
-```shell
-crx-tsc-init [входная_директория] [выходная_директория]
-```
-
-#### Аргументы:
-- `input_dir` - Корневая директория с исходным кодом
-- `output_dir` - Директория для скомпилированных файлов
-
-#### Опции:
-- `--input-dir`, `-i` - Корневая директория с исходным кодом
-- `--output-dir`, `-o` - Директория для скомпилированных файлов
-
-#### Пример:
-```shell
-crx-tsc-init ./src ./dist
-```
-
-## Конфигурация через package.json
-Вы можете настроить параметры компилятора в файле `package.json` вашего проекта:
+## ⚙️ Конфигурация через package.json
+Вы можете настроить параметры компиляции в `package.json` вашего расширения:
 ```json
 {
   "name": "my-extension",
@@ -364,72 +282,82 @@ crx-tsc-init ./src ./dist
     "pre_dist": "pre_dist",
     "dist": "dist",
     "key_file": "key.pem",
-    "manifest": "pre_dist/manifest.json"
+    "manifest": "pre_dist/manifest.json",
+    "file_type": "all"
   }
 }
 ```
 
-## Структура проекта
-Рекомендуемая структура проекта Chrome расширения:
-```text
-my-extension/
-├── package.json
-├── tsconfig.json
-├── key.pem
-├── src/
-│   ├── manifest.json
-│   ├── background.ts
-│   ├── popup.ts
-│   └── content.ts
-├── pre_dist/ (создается автоматически)
-└── dist/ (создается автоматически)
-```
+## 📋 Типы файлов
+- `crx` - Подписанный Chrome Extension (требует ключа)
+- `zip` - Архив для загрузки в Chrome Web Store
+- `all` - Оба формата (по умолчанию)
 
-## Обработка ошибок
-- При создании только CRX файла, если возникает ошибка подписи, процесс останавливается
-- При создании только ZIP файла, CRX файл создается и не удаляется (так как он не нужен)
-- В режиме по умолчанию создаются оба файла независимо друг от друга
+## 🔑 Генерация ключей
+#### Ключи генерируются в формате RSA 2048:
+- Приватный ключ сохраняется в PEM формате
+- Публичный ключ конвертируется в base64 для manifest.json и сохраняется в PEM формате
 
-## Процесс работы
-#### 1. Генерация ключей (один раз):
-```shell
-crx-keygen
-```
-
-#### 2. Добавление публичного ключа в manifest.json:
+После генерации добавьте в `manifest.json`:
 ```json
 {
-  "name": "My Extension",
-  "version": "1.0.0",
-  "key": "ваш_публичный_ключ_base64"
+  "key": "ваш_публичный_ключ_в_base64"
 }
 ```
 
-#### 3. Инициализация TypeScript конфигурации:
+## 🏗️ Рабочий процесс
+#### 1. Инициализация проекта:
 ```shell
 crx-tsc-init
 ```
-
+#### 2. Генерация ключей:
+```shell
+crx-keygen
+```
+#### 3. Добавьте ключ в manifest.json
 #### 4. Сборка расширения:
 ```shell
 crx-compiler
 ```
 
-## Зависимости
-- Node.js 14+
-- TypeScript 5.9+
-- Chrome для тестирования расширений
+## 📂 Структура директорий по умолчанию
+```text
+project/
+├── src/           # Исходные файлы расширения
+├── pre_dist/      # Подготовленные файлы (после tsc)
+├── dist/          # Готовые CRX/ZIP файлы
+├── key.pem        # Приватный ключ
+├── public_key.pem # Публичный ключ
+└── tsconfig.json  # Конфигурация TypeScript
+```
 
-## Лицензия
-[GPL-3.0-only](https://github.com/MagIlyasDOMA/crx-compiler/blob/main/LICENSE)
+## ⚠️ Ограничения
+- Несовместимые аргументы: `--only-crx` и `--only-zip` нельзя использовать одновременно
+- Для создания CRX файлов требуется установленный `crx3`
+- TypeScript файлы автоматически исключаются из копирования в pre_dist
 
-## Автор
-Маг Ильяс DOMA (MagIlyasDOMA)
+## 🔧 NPM Scripts (для разработки)
+```json
+{
+  "scripts": {
+    "precompile": "node precompile.js",
+    "compile": "node compiler.js",
+    "keygen": "node keygen.js",
+    "create_tsconfig": "node tsc_init.js",
+    "pack": "tsc && npm pack && node dev_scripts/rename_dist.js"
+  }
+}
+```
 
-## Репозиторий
-[https://github.com/MagIlyasDOMA/crx-compiler](https://github.com/MagIlyasDOMA/crx-compiler)
+## 🐛 Отладка
+#### Если возникают проблемы:
+1. Убедитесь, что все зависимости установлены
+2. Проверьте права доступа к файлам
+3. Убедитесь, что manifest.json корректен
+4. Проверьте, что приватный ключ существует и доступен
 
-## Поддержка
-Для сообщения об ошибках и предложений используйте Issues на GitHub:
+## 📄 Лицензия
+GPL-3.0-only - См. файл [LICENSE](https://github.com/MagIlyasDOMA/crx-compiler/blob/main/LICENSE) для подробностей
 
-[https://github.com/MagIlyasDOMA/crx-compiler/issues](https://github.com/MagIlyasDOMA/crx-compiler/issues)
+## 🤝 Вклад в проект
+Сообщения об ошибках и запросы на доработку принимаются через [GitHub Issues](https://github.com/MagIlyasDOMA/crx-compiler/issues)
