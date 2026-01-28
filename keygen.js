@@ -1,9 +1,18 @@
 #!/usr/bin/env node
-import { ArgumentParser } from "argparse";
+import { ArgumentParser as BaseParser } from "argparse";
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import { __version__ } from "./index.js";
-function generateChromeExtensionKey(privatePath = 'key.pem', publicPath = 'public.txt') {
+class ArgumentParser extends BaseParser {
+    parseArgs() {
+        const args = this.parse_args();
+        return {
+            publicKey: args.publicKey || args.public_key_path || 'public_key.pem',
+            privateKey: args.privateKey || args.private_key_path || 'key.pem',
+        };
+    }
+}
+function generateChromeExtensionKey(config) {
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
         modulusLength: 2048,
         publicKeyEncoding: {
@@ -25,11 +34,11 @@ function generateChromeExtensionKey(privatePath = 'key.pem', publicPath = 'publi
         .replace(/\+/g, '-')
         .replace(/\//g, '_')
         .replace(/=+$/, '');
-    fs.writeFileSync(privatePath, privateKey);
-    fs.writeFileSync(publicPath, publicKeyBase64);
+    fs.writeFileSync(config.privateKey, privateKey);
+    fs.writeFileSync(config.publicKey, config.publicKey.endsWith('.pem') ? publicKey : publicKeyBase64);
     console.log('✅ Keys generated:');
-    console.log(`   • ${privatePath} - private key`);
-    console.log(`   • ${publicPath} - public key for manifest.json`);
+    console.log(`   • ${config.privateKey} - private key`);
+    console.log(`   • ${config.publicKey} - public key for manifest.json`);
     console.log('\n📋 Add to manifest.json:');
     console.log(`"key": "${publicKeyBase64}"`);
 }
@@ -39,9 +48,12 @@ function main() {
         nargs: '?', default: 'key.pem' });
     parser.add_argument('public_key_path', { type: 'str', help: 'Path to public key file',
         nargs: '?', default: 'public_key.pem' });
+    parser.add_argument('--private-key', '--private', { type: 'str', help: 'Path to private key file',
+        dest: 'privateKey' });
+    parser.add_argument('--public-key', '--public', { type: 'str', help: 'Path to public key file',
+        dest: 'publicKey' });
     parser.add_argument('--version', '-v', { action: 'version', version: __version__ });
-    const args = parser.parse_args();
-    generateChromeExtensionKey(args.private_key_path, args.public_key_path);
+    generateChromeExtensionKey(parser.parseArgs());
 }
 main();
 //# sourceMappingURL=keygen.js.map

@@ -24,7 +24,12 @@ export interface Manifest {
     [key: string]: any;
 }
 
-export interface KeygenArgs {
+export interface KeygenConfig {
+    publicKey: string;
+    privateKey: string;
+}
+
+export interface KeygenArgs extends Partial<KeygenConfig> {
     private_key_path: string;
     public_key_path: string;
 }

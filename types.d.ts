@@ -6,9 +6,9 @@ interface BasePackageCrxConfig {
     key_file: string;
     manifest: string;
 }
-export interface CompilerArgs extends BasePackageCrxConfig {
-    only_crx: boolean;
-    only_zip: boolean;
+export interface CompilerArgs extends Partial<BasePackageCrxConfig> {
+    only_crx?: boolean;
+    only_zip?: boolean;
 }
 export interface PackageCrxConfig extends BasePackageCrxConfig {
     file_type: FileType;
@@ -19,7 +19,11 @@ export interface Manifest {
     version: string;
     [key: string]: any;
 }
-export interface KeygenArgs {
+export interface KeygenConfig {
+    publicKey: string;
+    privateKey: string;
+}
+export interface KeygenArgs extends Partial<KeygenConfig> {
     private_key_path: string;
     public_key_path: string;
 }

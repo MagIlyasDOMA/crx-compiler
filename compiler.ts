@@ -39,32 +39,31 @@ function main() {
 
     execSync('tsc')
 
-    exec(`crx3 pack ${config.pre_dist} -p ${config.key_file} -o ${extensionFile}.crx`, (error, stdout, stderr) => {
-        if (config.filetypeOnly('crx')) {
+    if (config.filetypeOnly('crx')) {
+        exec(`crx3 pack ${config.pre_dist} -p ${config.key_file} -o ${extensionFile}.crx`, (error, stdout, stderr) => {
             if (error) {
                 console.error(`Error creating CRX: ${error}`);
                 return;
             }
             console.log('CRX file created');
-        } else fs.rmSync(extensionFile + '.crx')
+        })
+    }
+    if (config.filetypeOnly('zip')) {
+        const output = fs.createWriteStream(extensionFile + '.zip');
+        const archive = archiver('zip', {zlib: {level: 9}});
 
-        if (config.filetypeOnly('zip')) {
-            const output = fs.createWriteStream(extensionFile + '.zip');
-            const archive = archiver('zip', {zlib: {level: 9}});
+        output.on('close', () => {
+            console.log(`Archive created: ${archive.pointer()} bytes`);
+        });
 
-            output.on('close', () => {
-                console.log(`Archive created: ${archive.pointer()} bytes`);
-            });
+        archive.on('error', (err) => {
+            throw err;
+        });
 
-            archive.on('error', (err) => {
-                throw err;
-            });
-
-            archive.pipe(output);
-            archive.directory(config.pre_dist, false);
-            archive.finalize();
-        }
-    })
+        archive.pipe(output);
+        archive.directory(config.pre_dist, false);
+        archive.finalize();
+    }
 }
 
 main()
