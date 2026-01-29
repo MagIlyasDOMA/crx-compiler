@@ -21,8 +21,8 @@ export function formatConfig(config: any): PrecompileConfig {
 }
 
 export default function main(config?: PrecompileConfig | any) {
-    config = formatConfig(config);
     if (!config) config = initParser();
+    config = formatConfig(config);
     const src = config.src, pre_dist = config.pre_dist;
     execSync('tsc');
 

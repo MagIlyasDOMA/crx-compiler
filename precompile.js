@@ -17,9 +17,9 @@ export function formatConfig(config) {
     };
 }
 export default function main(config) {
-    config = formatConfig(config);
     if (!config)
         config = initParser();
+    config = formatConfig(config);
     const src = config.src, pre_dist = config.pre_dist;
     execSync('tsc');
     try {

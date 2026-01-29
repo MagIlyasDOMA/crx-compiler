@@ -1,6 +1,6 @@
 {
   "name": "crx-compiler",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Chrome extensions compiler",
   "bin": {
     "crx-precompile": "precompile.js",
