@@ -255,6 +255,14 @@ crx-precompile -s src -p pre_dist -c
 # Полная сборка
 crx-compiler
 
+# Только CRX
+crx-compiler --only-crx
+crx-compiler -c
+
+# Только ZIP
+crx-compiler --only-zip
+crx-compiler -z
+
 # С очисткой всех директорий
 crx-compiler --clean
 crx-compiler -C
