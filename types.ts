@@ -3,17 +3,20 @@ export type FileType = 'zip' | 'crx' | 'all'
 export interface PrecompileConfig {
     src: string;
     pre_dist: string;
+    clean_pre_dist: boolean;
 }
 
 export interface BasePackageCrxConfig extends PrecompileConfig {
     dist: string;
     key_file: string;
     manifest: string;
+    clean_dist: boolean;
 }
 
 export interface CompilerArgs extends Partial<BasePackageCrxConfig> {
     only_crx?: boolean;
     only_zip?: boolean;
+    clean_all?: boolean;
 }
 
 export interface PackageCrxConfig extends BasePackageCrxConfig {

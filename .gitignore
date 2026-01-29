@@ -2,3 +2,5 @@
 node_modules
 *.tgz
 structure.txt
+types.js
+types.js.map

@@ -235,31 +235,45 @@ crx-keygen --private-key key.pem --public-key public_key.pem
 # Подготовка файлов к сборке
 crx-precompile
 
+# С очисткой pre_dist директории
+crx-precompile --clean
+crx-precompile -c
+
 # С параметрами
-crx-precompile --src src --pre-dist pre_dist
-crx-precompile -s src -p pre_dist
+crx-precompile --src src --pre-dist pre_dist --clean
+crx-precompile -s src -p pre_dist -c
 ```
 
 #### Параметры:
 - `--src`, `-s` - Исходная директория (по умолчанию: src)
 - `--pre-dist`, `-p` - Директория для подготовки (по умолчанию: pre_dist)
+`--clean`, `-c` - Удалить pre_dist директорию перед компиляцией
+`--version`, `-v` - Показать версию
 
 ### 4. Полная сборка расширения
 ```shell
-# Полная сборка (CRX + ZIP)
+# Полная сборка
 crx-compiler
 
-# Только CRX
-crx-compiler --only-crx
-crx-compiler -c
+# С очисткой всех директорий
+crx-compiler --clean
+crx-compiler -C
 
-# Только ZIP
-crx-compiler --only-zip
-crx-compiler -z
+# Очистка только pre_dist
+crx-compiler --clean-pre-dist
+crx-compiler -P
+
+# Очистка только dist
+crx-compiler --clean-dist
+crx-compiler -D
+
+# Комбинированные команды
+crx-compiler --only-crx --clean
+crx-compiler --only-zip --clean-dist
 
 # С кастомными путями
-crx-compiler --src src --pre-dist pre_dist --dist dist --key-file key.pem
-crx-compiler -s src -p pre_dist -d dist -k key.pem
+crx-compiler --src src --pre-dist pre_dist --dist dist --key-file key.pem --clean
+crx-compiler -s src -p pre_dist -d dist -k key.pem -C
 ```
 
 #### Параметры:
@@ -270,6 +284,9 @@ crx-compiler -s src -p pre_dist -d dist -k key.pem
 - `--manifest`, `-m` - Путь к manifest.json
 - `--only-crx`, `-c` - Собрать только CRX
 - `--only-zip`, `-z` - Собрать только ZIP
+- `--clean`, `-C` - Удалить ВСЕ директории (pre_dist и dist)
+- `--clean-pre-dist`, `-P` - Удалить только pre_dist директорию
+- `--clean-dist`, `-D` - Удалить только dist директорию
 
 ## ⚙️ Конфигурация через package.json
 Вы можете настроить параметры компиляции в `package.json` вашего расширения:
@@ -283,7 +300,9 @@ crx-compiler -s src -p pre_dist -d dist -k key.pem
     "dist": "dist",
     "key_file": "key.pem",
     "manifest": "pre_dist/manifest.json",
-    "file_type": "all"
+    "file_type": "all",
+    "clean_pre_dist": false,
+    "clean_dist": false
   }
 }
 ```
@@ -333,6 +352,7 @@ project/
 
 ## ⚠️ Ограничения
 - Несовместимые аргументы: `--only-crx` и `--only-zip` нельзя использовать одновременно
+- Аргументы `--clean`, `--clean-pre-dist` и `--clean-dist` также взаимоисключающие
 - Для создания CRX файлов требуется установленный `crx3`
 - TypeScript файлы автоматически исключаются из копирования в pre_dist
 
@@ -355,6 +375,11 @@ project/
 2. Проверьте права доступа к файлам
 3. Убедитесь, что manifest.json корректен
 4. Проверьте, что приватный ключ существует и доступен
+
+#### Если возникают ошибки очистки:
+1. **"The arguments are incompatible"** - Проверьте комбинацию флагов
+2. **Отсутствуют файлы после очистки** - Убедитесь, что нужные директории создаются заново
+3. **Проблемы с правами доступа** - Проверьте права на удаление директорий 
 
 ## 📄 Лицензия
 GPL-3.0-only - См. файл [LICENSE](https://github.com/MagIlyasDOMA/crx-compiler/blob/main/LICENSE) для подробностей

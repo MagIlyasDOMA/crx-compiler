@@ -32,4 +32,8 @@ examples/
 *.tmp
 .DS_Store
 Thumbs.db
+
+# Файлы для разработки
 structure.txt
+types.js
+types.js.map

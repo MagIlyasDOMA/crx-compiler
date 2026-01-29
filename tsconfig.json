@@ -30,5 +30,5 @@
     "useDefineForClassFields": true,
     "skipLibCheck": true
   },
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts", "hrenpack_js/src", "index.d.ts"]
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }
