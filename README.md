@@ -30,16 +30,16 @@ crx-tsc-init -i src -o pre_dist
 ```
 
 #### Parameters:
-- `input_dir`, `--input-dir`, `-i` - Source directory (default: src)
+- `input_dir`, `--input-dir`, `-i` - Input directory (default: src)
 - `output_dir`, `--output-dir`, `-o` - Output directory (default: pre_dist)
 - `--version`, `-v` - Show version
 
 ### 2. Key Generation
 ```shell
-# Key generation for signing the extension
+# Generating keys for signing the extension
 crx-keygen
 
-# With specified paths
+# Specifying paths
 crx-keygen key.pem public_key.pem
 crx-keygen --private-key key.pem --public-key public_key.pem
 ```
@@ -50,43 +50,68 @@ crx-keygen --private-key key.pem --public-key public_key.pem
 
 ### 3. Precompilation
 ```shell
-# Preparing files for building
+# Preparing files for build
 crx-precompile
 
+# With cleaning pre_dist directory
+crx-precompile --clean
+crx-precompile -c
+
 # With parameters
-crx-precompile --src src --pre-dist pre_dist
-crx-precompile -s src -p pre_dist
+crx-precompile --src src --pre-dist pre_dist --clean
+crx-precompile -s src -p pre_dist -c
 ```
 
 #### Parameters:
 - `--src`, `-s` - Source directory (default: src)
 - `--pre-dist`, `-p` - Preparation directory (default: pre_dist)
+`--clean`, `-c` - Remove pre_dist directory before compilation
+`--version`, `-v` - Show version
 
 ### 4. Full Extension Build
 ```shell
-# Full build (CRX + ZIP)
+# Full build
 crx-compiler
 
 # Only CRX
 crx-compiler --only-crx
 crx-compiler -c
-
 # Only ZIP
 crx-compiler --only-zip
 crx-compiler -z
-# With Custom Paths  
-crx-compiler --src src --pre-dist pre_dist --dist dist --key-file key.pem  
-crx-compiler -s src -p pre_dist -d dist -k key.pem  
-```  
+
+# With cleaning of all directories
+crx-compiler --clean
+crx-compiler -C
+
+# Cleaning only pre_dist
+crx-compiler --clean-pre-dist
+crx-compiler -P
+
+# Cleaning only dist
+crx-compiler --clean-dist
+crx-compiler -D
+
+# Combined commands
+crx-compiler --only-crx --clean
+crx-compiler --only-zip --clean-dist
+
+# Custom paths
+crx-compiler --src src --pre-dist pre_dist --dist dist --key-file key.pem --clean
+crx-compiler -s src -p pre_dist -d dist -k key.pem -C
+```
 
 #### Parameters:
 - `--src`, `-s` - Source directory
-- `--pre-dist`, `-p` - Directory for build preparation
+- `--pre-dist`, `-p` - Directory for preparation
 - `--dist`, `-d` - Output directory
 - `--key-file`, `-k` - Private key file
 - `--manifest`, `-m` - Path to manifest.json
 - `--only-crx`, `-c` - Build only CRX
 - `--only-zip`, `-z` - Build only ZIP
+- `--clean`, `-C` - Delete ALL directories (pre_dist and dist)
+- `--clean-pre-dist`, `-P` - Delete only pre_dist directory
+- `--clean-dist`, `-D` - Delete only dist directory
 
 ## ⚙️ Configuration via package.json
 You can configure compilation parameters in your extension's `package.json`:
@@ -100,57 +125,60 @@ You can configure compilation parameters in your extension's `package.json`:
     "dist": "dist",
     "key_file": "key.pem",
     "manifest": "pre_dist/manifest.json",
-    "file_type": "all"
+    "file_type": "all",
+    "clean_pre_dist": false,
+    "clean_dist": false
   }
 }
-```  
+```
 
-## 📋 File Types
+## 📋 File types
 - `crx` - Signed Chrome Extension (requires key)
-- `zip` - Archive for uploading to Chrome Web Store
+- `zip` - Archive for upload to Chrome Web Store
 - `all` - Both formats (default)
 
 ## 🔑 Key Generation
 #### Keys are generated in RSA 2048 format:
-- Private key is stored in PEM format
-- Public key is converted to base64 for `manifest.json` and stored in PEM format
+- Private key is saved in PEM format
+- Public key is converted to base64 for manifest.json and saved in PEM format
 
-After generating, add to `manifest.json`:
+After generation, add to `manifest.json`:
 ```json
 {
   "key": "your_public_key_in_base64"
 }
-```  
-
+```
 ## 🏗️ Workflow
 #### 1. Initialize the project:
 ```shell
 crx-tsc-init
-```  
+```
 #### 2. Generate keys:
 ```shell
 crx-keygen
-```  
-#### 3. Add key to manifest.json
+```
+#### 3. Add the key to manifest.json
 #### 4. Build the extension:
 ```shell
 crx-compiler
-```  
+```
 
-## 📂 Default directory structure
+## 📂 Default Directory Structure
 ```text
 project/
-├── src/           # Extension source files  
-├── pre_dist/      # Prepared files (after tsc)  
-├── dist/          # Ready CRX/ZIP files  
-├── key.pem        # Private key  
-├── public_key.pem # Public key  
-└── tsconfig.json  # TypeScript configuration  
+├── src/           # Extension source files
+├── pre_dist/      # Prepared files (after tsc)
+├── dist/          # Ready CRX/ZIP files
+├── key.pem        # Private key
+├── public_key.pem # Public key
+└── tsconfig.json  # TypeScript configuration
 ```
-## ⚠️ Limitations
+
+## ⚠️ Restrictions
 - Incompatible arguments: `--only-crx` and `--only-zip` cannot be used simultaneously
-- To create CRX files, `crx3` must be installed
-- TypeScript files are automatically excluded from copying in pre_dist
+- The arguments `--clean`, `--clean-pre-dist`, and `--clean-dist` are also mutually exclusive
+- Creating CRX files requires `crx3` to be installed
+- TypeScript files are automatically excluded from copying to pre_dist
 
 ## 🔧 NPM Scripts (for development)
 ```json
@@ -172,11 +200,16 @@ project/
 3. Ensure the manifest.json is correct
 4. Verify that the private key exists and is accessible
 
+#### If cleaning errors occur:
+1. **"The arguments are incompatible"** - Check the flag combinations
+2. **Missing files after cleaning** - Make sure the necessary directories are recreated
+3. **Access permission issues** - Check permissions for deleting directories
+
 ## 📄 License
-GPL-3.0-only - See the [LICENSE](https://github.com/MagIlyasDOMA/crx-compiler/blob/main/LICENSE) file for details
+GPL-3.0-only - See [LICENSE](https://github.com/MagIlyasDOMA/crx-compiler/blob/main/LICENSE) for details
 
 ## 🤝 Contributing to the project
-Bug reports and feature requests are welcome via [GitHub Issues](https://github.com/MagIlyasDOMA/crx-compiler/issues)
+Bug reports and feature requests are accepted via [GitHub Issues](https://github.com/MagIlyasDOMA/crx-compiler/issues)
 
 ---
 
