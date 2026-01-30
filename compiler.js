@@ -5,8 +5,7 @@ import path from 'path';
 import archiver from 'archiver';
 import { ArgumentParser as BaseParser } from "argparse";
 import { __version__ } from "./index.js";
-import { createDirs, getConfig, getPackage, removeDir } from "./utils.js";
-import precompile from "./precompile.js";
+import { createDirs, getConfig, getPackage, removeDir, precompile } from "./utils.js";
 export class ArgumentParser extends BaseParser {
     parse_args(args, ns) {
         const output = super.parse_args(args, ns);

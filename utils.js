@@ -1,5 +1,6 @@
-import fs from "fs";
+import fs from "fs-extra";
 import path from "path";
+import { execSync } from "child_process";
 export function getFileTypes(args) {
     if (args.only_crx)
         return 'crx';
@@ -40,5 +41,30 @@ export function getPackage() {
 }
 export function removeDir(path) {
     fs.rmSync(path, { recursive: true, force: true });
+}
+export function precompileConfig(config) {
+    return {
+        src: config.src || 'src',
+        pre_dist: config.pre_dist || 'pre_dist',
+        clean_pre_dist: config.clean_pre_dist || false
+    };
+}
+export function precompile(config) {
+    config = precompileConfig(config);
+    if (config.clean_pre_dist)
+        removeDir(config.pre_dist);
+    const src = config.src, pre_dist = config.pre_dist;
+    execSync('tsc');
+    try {
+        fs.ensureDirSync(pre_dist);
+        fs.copySync(src, pre_dist, {
+            filter: (file) => {
+                return path.extname(file) !== '.ts';
+            }
+        });
+    }
+    catch (e) {
+        console.error(e);
+    }
 }
 //# sourceMappingURL=utils.js.map

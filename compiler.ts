@@ -5,9 +5,8 @@ import path from 'path'
 import archiver from 'archiver'
 import {ArgumentParser as BaseParser, Namespace} from "argparse";
 import {__version__} from "./index.js";
-import {createDirs, getConfig, getPackage, removeDir} from "./utils.js";
+import {createDirs, getConfig, getPackage, removeDir, precompile} from "./utils.js";
 import { PackageCrxConfig, CompilerArgs } from "./types";
-import precompile from "./precompile.js";
 
 export class ArgumentParser extends BaseParser {
     parse_args(args?: string[], ns?: Namespace | object): CompilerArgs {

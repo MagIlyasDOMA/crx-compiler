@@ -1,6 +1,7 @@
-import fs from "fs";
+import fs from "fs-extra";
 import path from "path";
-import {CompilerArgs, FileType, Manifest, PackageCrxConfig} from "./types.js";
+import {CompilerArgs, FileType, Manifest, PackageCrxConfig, PrecompileConfig} from "./types.js";
+import {execSync} from "child_process";
 
 export function getFileTypes(args: CompilerArgs): FileType | void {
     if (args.only_crx) return 'crx';
@@ -43,4 +44,31 @@ export function getPackage(): Manifest {
 
 export function removeDir(path: string): void {
     fs.rmSync(path, {recursive: true, force: true});
+}
+
+export function precompileConfig(config: any): PrecompileConfig {
+    return {
+        src: config.src || 'src',
+        pre_dist: config.pre_dist || 'pre_dist',
+        clean_pre_dist: config.clean_pre_dist || false
+    }
+}
+
+export function precompile(config: PrecompileConfig) {
+    config = precompileConfig(config);
+    if (config.clean_pre_dist) removeDir(config.pre_dist);
+    const src = config.src, pre_dist = config.pre_dist;
+    execSync('tsc');
+
+    try {
+        fs.ensureDirSync(pre_dist);
+
+        fs.copySync(src, pre_dist, {
+            filter: (file: string) => {
+                return path.extname(file) !== '.ts';
+            }
+        });
+    } catch (e) {
+        console.error(e);
+    }
 }
