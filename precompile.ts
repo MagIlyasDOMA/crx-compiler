@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import {ArgumentParser} from "argparse";
 import {execSync} from "child_process";
 import {PrecompileConfig} from "./types";
