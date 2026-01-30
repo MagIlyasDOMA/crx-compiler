@@ -16,6 +16,8 @@ export function getConfig(args) {
         key_file: args.key_file || config.key_file || 'key.pem',
         manifest: args.manifest || config.manifest || path.join(preDistDirectory, 'manifest.json'),
         file_type: getFileTypes(args) || config.file_type || 'all',
+        clean_pre_dist: args.clean_pre_dist || args.clean_all || config.clean_pre_dist || false,
+        clean_dist: args.clean_dist || args.clean_all || config.clean_dist || false,
         filetypeOnly: function (fileType) {
             return [fileType, 'all'].includes(fileType);
         }
@@ -35,5 +37,8 @@ export function getPackage() {
         name: config.name || 'extension',
         version: config.version || '1.0.0',
     };
+}
+export function removeDir(path) {
+    fs.rmSync(path, { recursive: true, force: true });
 }
 //# sourceMappingURL=utils.js.map

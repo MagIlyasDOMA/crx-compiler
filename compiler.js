@@ -5,14 +5,22 @@ import path from 'path';
 import archiver from 'archiver';
 import { ArgumentParser as BaseParser } from "argparse";
 import { __version__ } from "./index.js";
-import { createDirs, getConfig, getPackage } from "./utils.js";
+import { createDirs, getConfig, getPackage, removeDir } from "./utils.js";
 import precompile from "./precompile.js";
 export class ArgumentParser extends BaseParser {
     parse_args(args, ns) {
         const output = super.parse_args(args, ns);
-        if (output.only_crx && output.only_zip)
+        if (this.isIncompatible(output))
             throw new Error('The arguments are incompatible');
         return output;
+    }
+    isIncompatible(output) {
+        return [
+            output.only_crx && output.only_zip,
+            output.clean_all && output.clean_pre_dist,
+            output.clean_all && output.clean_dist,
+            output.clean_pre_dist && output.clean_dist
+        ].some(Boolean);
     }
 }
 export default function main() {
@@ -25,9 +33,13 @@ export default function main() {
     parser.add_argument('--version', '-v', { action: 'version', version: __version__ });
     parser.add_argument('--only-crx', '-c', { action: 'store_true', help: 'Don\'t create a zip file' });
     parser.add_argument('--only-zip', '-z', { action: 'store_true', help: 'Don\'t create a crx file' });
+    parser.add_argument('--clean', '-C', { action: 'store_true', help: 'Delete pre_dist and dist directories', dest: 'clean_all' });
+    parser.add_argument('--clean-pre-dist', '-P', { action: 'store_true', help: 'Delete pre_dist directory' });
+    parser.add_argument('--clean-dist', '-D', { action: 'store_true', help: 'Delete dist directory' });
     const config = getConfig(parser.parse_args());
     const manifest = getPackage();
     const extensionFile = path.join(config.dist, `${manifest.name || 'extension'}-${manifest.version || '1.0.0'}`);
+    removeDir(config.dist);
     createDirs(config.src, config.pre_dist, config.dist);
     precompile(config);
     if (config.filetypeOnly('crx')) {

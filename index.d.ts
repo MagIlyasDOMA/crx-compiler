@@ -1,2 +1,2 @@
-export declare const __version__ = "1.0.0";
+export declare const __version__: any;
 //# sourceMappingURL=index.d.ts.map

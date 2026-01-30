@@ -4,4 +4,5 @@ export declare function getConfig(args: CompilerArgs): PackageCrxConfig;
 export declare function getManifest(filename: string): Manifest;
 export declare function createDirs(...paths: string[]): void;
 export declare function getPackage(): Manifest;
+export declare function removeDir(path: string): void;
 //# sourceMappingURL=utils.d.ts.map
