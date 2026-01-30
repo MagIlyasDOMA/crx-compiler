@@ -2,6 +2,7 @@ import fs from "fs-extra";
 import path from "path";
 import {CompilerArgs, FileType, Manifest, PackageCrxConfig, PrecompileConfig} from "./types.js";
 import {execSync} from "child_process";
+import Json5Converter from "json5converter";
 
 export function getFileTypes(args: CompilerArgs): FileType | void {
     if (args.only_crx) return 'crx';
@@ -52,6 +53,15 @@ export function precompileConfig(config: any): PrecompileConfig {
         pre_dist: config.pre_dist || 'pre_dist',
         clean_pre_dist: config.clean_pre_dist || false
     }
+}
+
+export function convertJSON5(preDistFolder: string) {
+    fs.readdirSync(preDistFolder).forEach(file => {
+        if (path.extname(file) === '.json5') {
+            const filePath = path.join(preDistFolder, file);
+
+        }
+    })
 }
 
 export function precompile(config: PrecompileConfig) {

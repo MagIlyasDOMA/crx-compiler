@@ -36,7 +36,8 @@
     "archiver": "^7.0.1",
     "argparse": "^2.0.1",
     "crx3": "^2.0.0",
-    "fs-extra": "^11.3.3"
+    "fs-extra": "^11.3.3",
+    "json5converter": "^1.0.0"
   },
   "devDependencies": {
     "@types/archiver": "^7.0.0",
